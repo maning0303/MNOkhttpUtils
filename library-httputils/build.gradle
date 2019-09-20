@@ -1,0 +1,47 @@
+apply plugin: 'com.android.library'
+
+android {
+    compileSdkVersion 28
+
+    defaultConfig {
+        minSdkVersion 14
+        targetSdkVersion 28
+        versionCode 1
+        versionName "1.0"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    task makeSdkJar(type: Copy) {
+        delete('build/libs/')
+        def buildTime = buildTime()
+        def version = defaultConfig.versionName
+        def fileName = 'okhttpUtils-' + version + '-' + buildTime
+        //jar
+        //设置拷贝的文件
+        from('build/intermediates/intermediate-jars/debug/')
+        //打进jar包后的文件目录
+        //将classes.jar放入build/libs/目录下
+        into('build/libs/')
+        //（我们只关心classes.jar这个文件）
+        include('classes.jar')
+        //重命名
+        rename('classes.jar', fileName + '.jar')
+    }
+    makeSdkJar.dependsOn(build)
+
+}
+
+def buildTime() {
+    return new Date().format("yyyyMMddHHmmss", TimeZone.getTimeZone("GMT+8:00"))
+}
+
+dependencies {
+    compileOnly files('libs/okhttp-3.11.0.jar')
+    compileOnly files('libs/okio-1.14.0.jar')
+}
